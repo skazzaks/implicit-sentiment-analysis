@@ -1,0 +1,342 @@
+aggravate , verschlimmern
+aggravate , verschlimmern
+aggravate , verschlimmern
+aggravate , verschlimmern
+aggravate , verschlimmern
+aggravate , verschlimmern
+aggravate , verschlimmern
+annoy , ärgern
+antagonize , verärgern
+arouse , wecken
+displease , missfallen
+embitter , verbittern
+enrage , wütend machen
+exacerbate , verschärfen
+exasperate , zur Verzweiflung bringen
+excite , erregen
+incense , Weihrauch
+inflame , entflammen
+infuriate , wütend machen
+irritate , reizen
+offend , beleidigen
+outrage , Empörung
+provoke , provozieren
+rankle , RANKL
+rile , Die Länder
+be angry that , böse sein, dass
+be angry about , wütend sein über
+be angry with , zürnen
+be angry at , werden wütend auf
+be wrathful that , sein zorniger, dass
+be irate that , werden wütend, dass
+expect , erwarten
+expect that , erwarten, dass
+predict , vorhersagen
+predict that , sagen voraus, dass
+assume , übernehmen
+assume that , davon ausgehen, dass
+await , warten
+await that , erwarten, dass
+count on , zählen auf
+count on , zählen auf
+forecast , Vorhersage
+forecast that , Prognose,
+foresee , vorhersehen
+foresee that , sehen vor, dass
+prepare for , Vorbereitung
+prepare for , Vorbereitung
+anticipate , erwarten
+hope for , erhoffen
+hope for , erhoffen
+hope for , erhoffen
+look forward to , freuen uns auf die
+look forward to , freuen uns auf die
+be averse to , abgeneigt sein
+disgust , Ekel
+bother , Mühe
+disenchant , entzaubern
+dislike , Abneigung
+disturb , stören
+insult , Beleidigung
+irk , ärgern
+loathe , verabscheuen
+nauseate , Übelkeit
+put off , abschrecken
+repulse , Abwehr
+revolt , Revolte
+shock , Schock
+sicken , krank machen
+turn off , ausschalten
+upset , aufgeregt
+hate , hassen
+hate that , hasse es, dass
+alarm , Alarm
+avoid , vermeiden
+dread , fürchten
+shun , meiden
+worry , Sorge
+worry about , Sorgen
+be RB worry about , sein RB Sorgen über
+be RB worry about , sein RB Sorgen über
+fear , Angst
+fear that , Angst, dass
+be RB afraid of , sein RB Angst
+be RB afraid that , Angst, dass RB werden
+be RB apprehensive about , besorgt über RB werden
+frighten , erschrecken
+be RB frightened that , RB sein erschrocken, dass
+scare , Schrecken
+be RB scared of , RB Angst von
+be RB scared that , RB sein erschrocken, dass
+spook , Spuk
+terrify , erschrecken
+petrify , versteinern
+intimidate , einschüchtern
+revel in , schwelgen in
+delight , Freude
+amuse , unterhalten
+attract , anziehen
+charm , Charme
+cheer , jubeln
+enchant , verzaubern
+enrapture , entzücken
+entertain , unterhalten
+enjoy , genießen
+enjoy that , genießen Sie, dass
+take pleasure in , Freude an
+fascinate , faszinieren
+gratify , befriedigen
+please , bitte
+rejoice that , freuen, dass
+satisfy , erfüllen
+thrill , Nervenkitzel
+wow , wow
+be RB happy (?! to) (?!\d) that , RB glücklich werden (?! to) (?! \ d) dass
+be RB happy about , glücklich über RB werden
+be RB happy about , glücklich über RB werden
+be RB glad (?! to) (?!\d) that , RB freuen (?! to) (?! \ d) dass
+be RB content (?! to) (?!\d) that , RB sein Inhalt (?! to) (?! \ d) dass
+sadden , betrüben
+discourage , entmutigen
+dishearten , entmutigen
+dispirit , entmutigen
+grieve that , trauern, dass
+be sad that , traurig sein, dass
+be melancholic that , melancholisch sein, dass
+feel sorrow that , fühlen Trauer, die
+mourn , trauern
+mourn that , trauern, dass
+deplore , bedauern
+deplore that , beklagen, dass
+regret , bedauern
+regret that , bedauern, dass
+astonish , Erstaunen
+amaze , verblüffen
+astound , überraschen
+awe , Ehrfurcht
+bewilder , Verwirren
+confound , verwirren
+confuse , verwirren
+dazzle , blenden
+disconcert , beirren
+dismay , Bestürzung
+dumbfound , verblüffen
+flabbergast , verblüffen
+overwhelm , überwältigen
+perplex , verwirren
+rattle , Rassel
+shock , Schock
+surprise , Überraschung
+startle , erschrecken
+stun , betäuben
+unsettle , verunsichern
+stupefy , verblüffen
+count on , zählen auf
+look to , schauen, um
+trust , Vertrauen
+trust in , Vertrauen
+trust that , Vertrauen,
+rely on , bauen auf
+place reliance on , setzen Vertrauen auf
+afflict , heimsuchen
+annoy , ärgern
+be RB anxious about , besorgt über RB werden
+be RB anxious that , besorgt, dass RB werden
+be RB anxious for , besorgt für RB werden
+appall , entsetzen
+be RB apprehensive that , besorgt, dass RB werden
+be RB ashamed of , schämen RB werden
+be RB ashamed of , schämen RB werden
+feel RB bitter about , fühlen RB bitter über
+be RB gutted about , sein RB entkernt über
+take comfort in , Trost in
+take comfort in , Trost in
+take pleasure in , Freude an
+take pleasure in , Freude an
+concern , Sorge
+be RB concerned about , besorgt über RB werden
+be RB concerned about , besorgt über RB werden
+be RB confident of , zuversichtlich, RB werden
+be RB confident of , zuversichtlich, RB werden
+be RB curious about , neugierig RB werden
+be RB curious about , neugierig RB werden
+depress , niederdrücken
+be RB desperate to , verzweifelt, RB werden
+disappoint , enttäuschen
+be RB disappoint that , RB enttäuschen werden, dass
+discourage , entmutigen
+disgust , Ekel
+dissatisfy , nicht befriedigen
+disillusion , Desillusionierung
+distress , Not
+be RB eager for , eifrig für RB werden
+be RB eager to , begierig, RB werden
+be RB ecstatic that , ekstatisch, dass RB werden
+be RB elated that , RB beschwingt sein, dass
+elate , leben
+embarrass , in Verlegenheit bringen
+be RB embarrass about , sein RB Verlegenheit bringen zu
+be RB embarrass for , sein RB Verlegenheit für
+encourage , fördern
+be RB enthusiastic about , begeistert von RB werden
+envy , Neid
+be RB envious of , neidisch auf RB werden
+be RB excite about , RB erregt werden über
+be RB fascinate with , sein RB faszinieren mit
+frustrate , frustrieren
+be RB frustrate with , sein RB vereiteln mit
+be RB furious about , wütend über RB werden
+be RB furious about , wütend über RB werden
+be RB hesitant to , zögern, RB werden
+be RB hopeful that , hoffnungsvoll, dass RB werden
+horrify , entsetzen
+humiliate , demütigen
+be RB indignant over , RB empört sein über
+be RB intent on , RB sein Vorsatz
+intrigue , Intrigen
+be RB joyful about , fröhlich über RB werden
+be RB joyful about , fröhlich über RB werden
+be RB keen on , am scharfen RB werden
+be RB keen on , am scharfen RB werden
+be RB keen to , daran interessiert, RB werden
+long RB for , Lang RB für
+long RB to , Lang RB zu
+be RB lucky that , Glück, dass RB werden
+be RB mad about , mad about RB werden
+be RB mad about , mad about RB werden
+menace , Bedrohung
+be RB miserable that , elend, dass RB werden
+be RB optimistic that , optimistisch, dass RB werden
+be RB overjoyed that , sein RB überglücklich, dass
+be RB proud of , stolz RB werden
+be RB proud of , stolz RB werden
+be RB unhappy about , unglücklich über RB werden
+be RB unhappy about , unglücklich über RB werden
+be RB unhappy that , unglücklich, dass RB werden
+be RB unhappy that , unglücklich, dass RB werden
+ache for , Schmerz für
+aspire to , erstreben
+aspire after , streben nach
+aspire , streben
+covet , begehren
+crave for , sich sehnen
+crave , begehren
+desire , Wunsch
+hanker after , sehnen nach
+hanker for , sehnen für
+hunger for , hungern nach
+have an itch to , haben ein Jucken an
+be loath to , sein ungern
+lust for , begehren
+lust after , begehren
+pine for , Kiefer für
+thirst for , Durst nach
+yearn for , sehnen sich nach
+agonize over , ringen den Kopf über
+agonise over , quält über
+fret about , Gedanken über
+fuss about , herumfuhrwerken
+make a fuss about , machen viel Aufhebens
+make a fuss of , viel Aufhebens machen von
+make a fuss over , viel Aufhebens machen über
+be obsess with , sein besessen mit
+affront , Beleidigung
+agitate , agitieren
+be appall at , bei erschrecken werden
+be astonish at , sein Erstaunen an
+befuddle , verwirren
+relish , genießen
+savour , Geschmack
+savor , Geschmack
+abash , Beschämen
+aggrieve , bedrücken
+agonize , zerbrechen
+antagonize , verärgern
+appeal , Beschwerde
+arouse , wecken
+baffle , Umlenkblech
+beguile , betören
+bewitch , verzaubern
+boggle , glotzen
+bore , Bohrloch
+calm , Ruhe
+captivate , bestechen
+charm , Charme
+comfort , Komfort
+conciliate , versöhnen
+devastate , verwüsten
+disappoint , enttäuschen
+discomfit , Unbehagen verursachen
+enthrall , begeistern
+exhilarate , berauschen
+faze , Phase
+floor , Fußboden
+flummox , flummox
+fluster , verwirren
+fulfill , erfüllen
+gall , Galle
+gladden , erfreuen
+grate , Gitter
+harass , belästigen
+hearten , ermutigen
+impress , beeindrucken
+madden , verrückt machen
+mollify , besänftigen
+mortify , kasteien
+mystify , verwirren
+nettle , Nessel
+nonplus , verblüffen
+perturb , stören
+placate , besänftigen
+puzzle , Puzzle
+reassure , beruhigen
+repel , abstoßen
+shame , Schande
+solace , Trost
+soothe , beruhigen
+stagger , taumeln
+sting , Stachel
+torment , Qual
+traumatize , traumatisieren
+trouble , Schwierigkeiten
+unnerve , entnerven
+unsettle , verunsichern
+vex , wächst
+alienate , entfremden
+estrange , entfremden
+be RB nervous about , nervös RB werden
+awe , Ehrfurcht
+demoralize , demoralisieren
+demoralise , demoralisieren
+abhor , verabscheuen
+abominate , verabscheuen
+execrate , abscheulich
+repent , bereuen
+rue , rue
+chagrin , Ärger
+abase , wer hatte
+inspire , inspirieren
+contemn , contemn
+despise , verachten
+scorn , Verachtung
+disdain , Verachtung
