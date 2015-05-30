@@ -5,16 +5,23 @@
 # a list of dependency parsed sentences
 import sys
 import random
-
+reload(sys)
+sys.setdefaultencoding('utf-8')
 POS_SENT_NUM = 0
 POS_WORD = 1
 POS_POS = 5
 POS_ROLE = 11
 POS_SUB = "SB"
 POS_PPER = "PPER"
-MAX_LEN = 10
+MAX_LEN = 20
+
+if(len(sys.argv) < 3):
+    print "Usage: detect_sentences [file with sentences] [sentiment lexicon file"
+    sys.exit(0)
 
 input_file = sys.argv[1]
+lexicon_file = sys.argv[2]
+
 random.seed()
 
 # This is our first shot at detection - grab all the sentences that
@@ -33,10 +40,19 @@ def phase1_detection(f):
         if len(line) < 2:
             # We are on a new sentence
             # 1) Let's see if the old one was success
-            if success:
-                total_successes += 1
-                #print previous_sentence
-                sentences.append(previous_sentence)
+            if success: 
+                with open (lexicon_file, "r") as myfile:
+                    for lex in myfile:
+                        # Weird check - the word must start with this. We should probably change this later
+                        if " " + lex.strip() in previous_sentence:
+                            #print "FOUND: " + lex     
+                            #print previous_sentence 
+                               
+                
+                            total_successes += 1
+                            #print previous_sentence
+                            sentences.append(lex.strip() + ", " + previous_sentence)
+                            break
 
             # 2) Reset variables
             new_sentence = True
@@ -65,15 +81,19 @@ def phase1_detection(f):
             # Sentence length limit
             if current_word > MAX_LEN:
                 success = False
-
+               
             previous_sentence += " " + s[POS_WORD]
             current_word += 1
 
+
+
     print "Sentence Count: " + str(total_sentences) + "\tSuccesses: " + str(total_successes) + "\n"
     print "Sample Sentences: \n"
-    for i in range(1, 25):
-        x = random.randrange(0, len(sentences))
-        print sentences[x]
+    #for i in range(1, 25):
+    #    x = random.randrange(0, len(sentences))
+    #    print sentences[x]
+    for sent in sentences:
+        print sent
     
 with open(input_file) as f:
     phase1_detection(f)
