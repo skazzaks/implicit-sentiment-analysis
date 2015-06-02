@@ -14,6 +14,7 @@ POS_ROLE = 11
 POS_SUB = "SB"
 POS_PPER = "PPER"
 MAX_LEN = 20
+POS_COMMA = ","
 
 if(len(sys.argv) < 3):
     print "Usage: detect_sentences [file with sentences] [sentiment lexicon file"
@@ -78,6 +79,9 @@ def phase1_detection(f):
             if s[POS_POS] == POS_PPER:
                 success = False
 
+            # Make sure there is no comma in the first pass
+            if s[POS_WORD] == POS_COMMA:
+                success = False
             # Sentence length limit
             if current_word > MAX_LEN:
                 success = False
