@@ -17,12 +17,12 @@ MAX_LEN = 20
 POS_COMMA = ","
 
 if(len(sys.argv) < 3):
-    print "Usage: detect_sentences [file with sentences] [sentiment lexicon file"
+    print "Usage: detect_sentences [file with sentences] [sentiment lexicon file] [opt: -s (for summary information)]"
     sys.exit(0)
 
 input_file = sys.argv[1]
 lexicon_file = sys.argv[2]
-
+summary_info = True if len(sys.argv) >= 4 and sys.argv[3] == "-s" else False
 random.seed()
 
 # This is our first shot at detection - grab all the sentences that
@@ -52,7 +52,9 @@ def phase1_detection(f):
                 
                             total_successes += 1
                             #print previous_sentence
-                            sentences.append(lex.strip() + ", " + previous_sentence)
+                            if summary_info:
+                                sentences.append(lex.strip() + ",")
+                            sentences.append(previous_sentence)
                             break
 
             # 2) Reset variables
@@ -91,8 +93,9 @@ def phase1_detection(f):
 
 
 
-    print "Sentence Count: " + str(total_sentences) + "\tSuccesses: " + str(total_successes) + "\n"
-    print "Sample Sentences: \n"
+    if summary_info:
+        print "Sentence Count: " + str(total_sentences) + "\tSuccesses: " + str(total_successes) + "\n"
+        print "Sample Sentences: \n"
     #for i in range(1, 25):
     #    x = random.randrange(0, len(sentences))
     #    print sentences[x]

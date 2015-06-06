@@ -1,0 +1,20 @@
+Author: Devon Fritz
+
+This file outlines the purpose and process of our Implicit Sentiment Analysis Tool
+
+Purpose:
+Given a sentence like "The people were happy the Chavez has fallen.", we would like to be able to induce the implicit sentiments hidden in the text. In this case, we can likely infer from the explicit sentiments "The people were happy (a positive sentiment) about X" and the negative event "Chavez has fallen", that since people have a positive sentiment about an event that is negative to an entity, that the people most likely don not like that entity.
+
+Process:
+
+1) Compile a lexicon of sentiment words.
+	1) Used a List of English sentiment words (source needed)
+	2) Converted list to German using self-written python script and Google Translate look-up plugin
+	3) Lemmatize and get Lexemes for words using "pattern" module. 
+	4) Sort and get the unique set of words in the list "sort -u [filename]". This gives us a final list of reasonable words.
+
+2) Use Lexicon to find sentences of interest.
+
+3) Find named entities in new set that appear often.
+
+4) 
