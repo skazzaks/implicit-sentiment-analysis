@@ -7,6 +7,7 @@ HDPRO_PATH = "/Users/juliussteen/Downloads/de.uniheidelberg.cl.hdpro.german-pipe
 BLANK_STR = "_"
 POS_ADV = "ADV"
 POS_NICHT = "PTKNEG"
+POS_PPER = "PPER"
 
 def run_hdpro(filename):
     subprocess.call(["java", "-jar", HDPRO_PATH,
@@ -22,6 +23,9 @@ def is_complex_sentence(sentence):
 
 def has_named_entity_subject(sentence):
     return sentence.subject_node.pos_tag == "NE"
+
+def has_no_unresolved_pronouns(sentence):
+    return not sentence.has_unresolved_pronoun
 
 class has_trigger_pred:
     def __init__(self, triggers_filename):
@@ -62,6 +66,19 @@ class SentenceTuple:
     @property
     def is_complex_sentence(self):
         return isinstance(self.object_node, SentenceTuple)
+
+    @property
+    def has_unresolved_pronoun(self):
+        if self.subject_node.pos_tag == POS_PPER:
+            return True
+        if self.is_complex_sentence:
+            if self.object_node.subject_node.pos_tag == POS_PPER or self.object_node.object_node.pos_tag == POS_PPER:
+                return True
+        else:
+            if self.object_node.pos_tag  == POS_PPER:
+                return True
+
+        return False
 
     def __str__(self):
         return '{0} "{1}"'.format(self.to_str(), self.predicate_node.flat_text)
@@ -117,7 +134,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
 
-    filter_processor = SentenceFilterProcessor([is_complex_sentence, has_named_entity_subject, has_trigger_pred(args.triggerfile)])
+    filter_processor = SentenceFilterProcessor([is_complex_sentence, has_named_entity_subject, has_trigger_pred(args.triggerfile), has_no_unresolved_pronouns])
     dependency.process_sdewac_splits(args.indir, filter_processor)
     print "Found {0} candidates".format(filter_processor.success_count)
 
