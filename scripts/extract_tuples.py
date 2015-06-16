@@ -4,6 +4,9 @@ import dependency
 import copy
 
 HDPRO_PATH = "/Users/juliussteen/Downloads/de.uniheidelberg.cl.hdpro.german-pipelines-0.3-with-dependencies.jar"
+BLANK_STR = "_"
+POS_ADV = "ADV"
+POS_NICHT = "PTKNEG"
 
 def run_hdpro(filename):
     subprocess.call(["java", "-jar", HDPRO_PATH,
@@ -50,10 +53,11 @@ class SentenceFilterProcessor:
         return True
 
 class SentenceTuple:
-    def __init__(self, predicate_node, subject_node, object_node):
+    def __init__(self, predicate_node, subject_node, object_node, modifiers):
         self.predicate_node = predicate_node
         self.subject_node = subject_node
         self.object_node = object_node
+        self.modifiers = modifiers
 
     @property
     def is_complex_sentence(self):
@@ -64,16 +68,26 @@ class SentenceTuple:
 
     def to_str(self):
         subject_str = self.subject_node.word
+        
+        # If we have a Target, concatenate it. If not, add a blank
         if self.is_complex_sentence:
-            object_str = self.object_node.to_str()
+            object_str = BLANK_STR 
         else:
             object_str = self.object_node.word
-        return "({0}, {1}, {2})".format(self.predicate_node.word, subject_str, object_str)
-
+        
+        final_str =  "{0}, {1}, {2}, {3}, ".format(self.predicate_node.word, subject_str, object_str, " ".join(self.modifiers))
+        
+        if self.is_complex_sentence:
+            final_str += str(self.object_node.to_str())
+      
+        return final_str
+    
 def analyse_sentence(root_node):
     subject, dir_object = get_subject_and_object_from_node(root_node)
+    modifiers = get_modifiers(root_node)
+	
     if subject and dir_object:
-        return SentenceTuple(root_node, subject, dir_object)
+        return SentenceTuple(root_node, subject, dir_object, modifiers)
 
     comp_phrase = root_node.find_child_by_label("OC")
 
@@ -81,18 +95,27 @@ def analyse_sentence(root_node):
         embeded_sentence = analyse_sentence(comp_phrase)
 
         if subject and embeded_sentence:
-            return SentenceTuple(root_node, subject, embeded_sentence)
+            return SentenceTuple(root_node, subject, embeded_sentence, modifiers)
 
 def get_subject_and_object_from_node(root_node):
     subject = root_node.find_child_by_label("SB")
     dir_object = root_node.find_child_by_label("OA")
     return subject, dir_object
 
+# Retrieves the set of modifiers (right now just adverbs) that occur
+# at the provided level of the sentence
+def get_modifiers(root_node):
+    results = list(root_node.find_children_by_POS_tag(POS_ADV))
+    results.extend(list(root_node.find_children_by_POS_tag(POS_NICHT)))
+    return results
+    
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="")
     parser.add_argument("indir")
     parser.add_argument("triggerfile")
     args = parser.parse_args()
+
 
     filter_processor = SentenceFilterProcessor([is_complex_sentence, has_named_entity_subject, has_trigger_pred(args.triggerfile)])
     dependency.process_sdewac_splits(args.indir, filter_processor)
