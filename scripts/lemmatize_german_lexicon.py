@@ -12,6 +12,4 @@ input_file = sys.argv[1]
 with open(input_file) as f:
     for line in f:
         print lemma(line.strip())
-        for l in lexeme(line.strip()):
-            print l
 
