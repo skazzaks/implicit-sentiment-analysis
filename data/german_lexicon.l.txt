@@ -1,170 +1,165 @@
-abneigen
-abneigungen
-abscheulichen
-abschrecken
-abstoßen
-abwehren
-agitieren
-alarmen
-anfreuden
-angen
-anziehen
-ärgern
-Ärgern
-aufregen
-ausschelten
-bedauern
-bedrohungen
-bedrücken
-beeindrucken
-befriedigen
-begehren
-begeistern
-begierigen
-beirren
-beklagen
-belästigen
-beleidigen
-beleidigungen
-berauschen
-bereuen
-beruhigen
-besänftigen
-beschämen
-beschwerden
-beschwingen
-besorgen
-bestechen
-bestürzungen
-betäuben
-betören
-betrüben
-bitten
-blenden
-bösen
-charmen
-demoralisieren
-demütigen
-desillusionierungen
-ehrfurchen
-eifrigen
-einschüchtern
-ekeln
-ekstatischen
-empören
-empörungen
-entflammen
-entfremden
-entmutigen
-entnerven
-entsetzen
-enttäuschen
-entzaubern
-entzücken
-erfreuen
-erfüllen
-erhoffen
-ermutigen
-erregen
-erschrecken
-erstaunen
-erstreben
-erwarten
-faszinieren
-fördern
-freuden
-freuen
-frustrieren
-fürchen
-gallen
-gedanken
-geniaßen
-geschmacken
-gittern
-glotzen
-glücklichen
-hassen
-heimsuchen
-herumfuhrwerken
-inspirieren
-intrigen
-jubeln
-kasteien
-kranken
-kritisieren
-leben
-meiden
-melancholischen
-missfallen
-mühen
-neidischen
-nervenkitzeln
-neugierigen
-niederdrücken
-phasen
-provozieren
-quälen
-qualten
-rankln
-rasseln
-reizen
-revoln
-ruhen
-schämen
-schanden
-scharfen
-schocken
-schrecken
-schwelgen
-sehnen
-sorgen
-spuken
-stacheln
-stören
-streben
-taumeln
-trauern
-traumatisieren
-traurigen
-troen
-Übelkeien
-übernehmen
-überraschen
-Überraschungen
-überwältigen
-umlenkblechen
-ungern
-unterhalten
-verabscheuen
-verachten
-verachtungen
-verärgern
-verbittern
-verblüffen
-vereiteln
-vermeiden
-verschärfen
-verschlimmern
-versöhnen
-versteinern
-vertrauen
-verunsichern
-verwirren
-verwüsen
-verzaubern
-verzweifeln
-vorbereitungen
-vorhersagen
-vorhersehen
-wächen
-warten
-wecken
-weihrauchen
-wowen
-wunschen
-wüten
-zählen
-zerbrechen
-zornigern
-zürnen
-zuversichtlichen
+abneigen -
+abneigungen -
+abscheulichen -
+abschrecken -
+abstoßen -
+abwehren -
+agitieren -
+alarmen -
+anfreuden +
+# angen 
+anziehen +
+ärgern -
+aufregen -
+ausschelten -
+bedauern -
+bedrohungen -
+bedrücken -
+beeindrucken +
+befriedigen +
+begehren +
+begeistern +
+begierigen +
+beirren -
+beklagen -
+belästigen -
+beleidigen -
+beleidigungen -
+berauschen +
+bereuen -
+beruhigen +
+besänftigen +
+beschämen -
+beschwerden -
+beschwingen +
+besorgen -
+bestechen -
+bestürzungen -
+#betäuben -
+betören + 
+betrüben -
+#bitten
+blenden -
+böse -
+charmen +
+demoralisieren -
+demütigen -
+desillusionierungen -
+ehrfurchen +
+eifrigen +
+einschüchtern -
+ekeln -
+ekstatischen +
+empören -
+empörungen -
+#entflammen 
+entfremden -
+entmutigen -
+entnerven -
+entsetzen -
+enttäuschen -
+entzaubern -
+entzücken +
+erfreuen +
+erfüllen +
+erhoffen +
+ermutigen +
+erregen +
+erschrecken -
+erstaunen +
+erstreben +
+erwarten +
+faszinieren +
+fördern +
+freuden +
+freuen +
+frustrieren -
+fürchen -
+galle -
+#gedanken 
+genießen +
+geschmack +
+heimsuchen -
+#herumfuhrwerken 
+inspirieren +
+intrigen -
+jubeln +
+kasteien -
+kranken -
+kritisieren -
+#leben
+meiden -
+melancholischen -
+missfallen -
+mühen +
+neidischen -
+nervenkitzel +
+neugierig +
+niederdrücken -
+#phasen 
+provozieren -
+quälen -
+qual -
+rasseln -
+reizen -
+revolte -
+ruhen +
+schämen -
+schande -
+scharfen -
+schock -
+schrecken -
+schwelgen +
+sehnen +
+sorgen -
+spuken -
+#stachel
+stören -
+streben +
+taumeln -
+trauern -
+traumatisieren -
+traurig -
+trost +
+Übelkeit - 
+#übernehmen
+#überraschen
+#Überraschungen
+überwältigen -
+umlenkblech - 
+ungern -
+#unterhalten
+verabscheuen -
+verachten -
+verachtung -
+verärgern -
+verbittern -
+verblüffen -
+vereiteln -
+vermeiden -
+verschärfen -
+verschlimmern -
+versöhnen +
+versteinern -
+vertrauen -
+verunsichern -
+verwirren -
+verwüsten - 
+verzaubern +
+verzweifeln -
+#vorbereitungen
+#vorhersagen
+#vorhersehen
+#wächen
+#warten
+#wecken
+erbosen -
+ergrimmen -
+#wow
+wünschen +
+wütend -
+#zählen
+zerbrechen -
+zornig -
+zürnen -
+zuversichtlich +

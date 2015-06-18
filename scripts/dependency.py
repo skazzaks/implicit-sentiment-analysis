@@ -7,7 +7,6 @@ class DependencyNode:
         self.word = word
         self.lemma = lemma
         self.pos_tag = pos_tag
-
         self.children = []
         self.parent = None
 
