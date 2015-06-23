@@ -88,30 +88,36 @@ def process_conll_stream(instream, processor):
 
 def process_sdewac_splits(root_directory, processor):
     for file_ in os.listdir(root_directory):
-        file_path = os.path.join(root_directory, file_)
-        with gzip.open(file_path, 'rb') as f:
-            process_conll_stream(f, processor)
+        try:
+            file_path = os.path.join(root_directory, file_)
+            with gzip.open(file_path, 'rb') as f:
+                process_conll_stream(f, processor)
+        except Exception as e:
+            print "Skipping file: {0}".format(file_)
 
 def decode_conll_parse(instream):
-    raw_nodes_by_parents = {}
-    for line in instream:
-        if len(line.strip()) == 0:
-            break
-        components = line.split()
-        id = int(components[0].split("_")[1])
-        raw_nodes_by_parents.setdefault(int(components[9]), []).append((DependencyNode(id, components[1], components[3], components[5]), components[11]))
+    try:
+        raw_nodes_by_parents = {}
+        for line in instream:
+            if len(line.strip()) == 0:
+                break
+            components = line.split()
+            id = int(components[0].split("_")[1])
+            raw_nodes_by_parents.setdefault(int(components[9]), []).append((DependencyNode(id, components[1], components[3], components[5]), components[11]))
 
-    if len(raw_nodes_by_parents) == 0:
+        if len(raw_nodes_by_parents) == 0:
+            return None
+
+        root_nodes = list(map(lambda n: n[0], raw_nodes_by_parents[0]))
+        for root_node in root_nodes:
+            unprocessed_nodes = [root_node]
+            while len(unprocessed_nodes) > 0:
+                node = unprocessed_nodes.pop()
+                for child, relation_label in raw_nodes_by_parents.get(node.id, []):
+                    node.add_child(child, relation_label)
+                    unprocessed_nodes.append(child)
+
+        return root_nodes
+    except ValueError:
         return None
-
-    root_nodes = list(map(lambda n: n[0], raw_nodes_by_parents[0]))
-    for root_node in root_nodes:
-        unprocessed_nodes = [root_node]
-        while len(unprocessed_nodes) > 0:
-            node = unprocessed_nodes.pop()
-            for child, relation_label in raw_nodes_by_parents.get(node.id, []):
-                node.add_child(child, relation_label)
-                unprocessed_nodes.append(child)
-
-    return root_nodes
 

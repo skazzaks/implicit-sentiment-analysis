@@ -4,6 +4,9 @@ import subprocess
 import argparse
 import dependency
 import copy
+import sys
+
+from collections import Counter
 
 HDPRO_PATH = "/Users/juliussteen/Downloads/de.uniheidelberg.cl.hdpro.german-pipelines-0.3-with-dependencies.jar"
 BLANK_STR = "_"
@@ -32,6 +35,11 @@ def has_no_unresolved_pronouns(sentence):
 def has_trigger_pred(sentence):
     return sentence.predicate_trigger is not None
 
+def is_not_reflexive(sentence):
+    if sentence.is_complex_sentence:
+        return is_not_reflexive(sentence.object_node)
+    return sentence.object_node.pos_tag != "PRF"
+
 class get_trigger_predicate:
     def __init__(self, triggers_filename):
         with open(triggers_filename, "r") as f:
@@ -40,7 +48,6 @@ class get_trigger_predicate:
     def __call__(self, predicate):
         match = [(trig, polarity) for trig, polarity in self.triggers if predicate.lemma.lower() == trig]
         if len(match) is not 0:
-            #print predicate.lemma
             return match[0][0], match[0][1]
         else:
             return [None, None]
@@ -114,14 +121,66 @@ class SentenceCounter:
         self.count = 0
 
     def __call__(self, root_nodes, local_context):
+        self.count += 1
+        return PipelineProcessingStatus.CONTINUE
+
+class CountIndicator:
+    def __init__(self, counter, prefix):
+        self.counter = counter
+        self.prefix = prefix
+
+    def __call__(self, root_nodes, local_context):
+        sys.stdout.write(self.prefix + str(self.counter.count))
+        sys.stdout.write("\r")
+        sys.stdout.flush()
+
         return PipelineProcessingStatus.CONTINUE
 
 class EntityCollector:
     def __init__(self):
-        self.subj_position_named_entities = Counter()
+        self.subj_position_entities_counter = Counter()
+        self.obj_position_entities_counter = Counter()
+        self.relation_counter = Counter()
 
     def __call__(self, root_nodes, local_context):
-        pass
+        sentence = local_context.sentence
+        self.count_sentence(sentence)
+
+        return PipelineProcessingStatus.CONTINUE
+
+    def count_sentence(self, sentence):
+        all_entity_strs = []
+        curr_sentence = sentence
+
+        while curr_sentence.is_complex_sentence:
+            subj_str = curr_sentence.subject_node.word
+            all_entity_strs.append(subj_str)
+            self.subj_position_entities_counter[subj_str] += 1
+
+            curr_sentence = curr_sentence.object_node
+
+        subj_str = sentence.subject_node.word
+        self.subj_position_entities_counter[subj_str] += 1
+        all_entity_strs.append(subj_str)
+
+        obj_str = curr_sentence.object_node.word
+        self.obj_position_entities_counter[obj_str] += 1
+        all_entity_strs.append(obj_str)
+
+        self.relation_counter.update(fold_forward(all_entity_strs))
+
+def fold_forward(list_):
+    """
+    Combines the elements in an iterable into two-tuples
+    so that each element is combined with all elements that follow it.
+    """
+    if len(list_) == 1:
+        return []
+    result = []
+    for idx, elem1 in enumerate(list_):
+        for elem2 in list_[idx + 1:]:
+            result.append((elem1, elem2))
+    return result
 
 class SentenceLimiter:
     def __init__(self, limit):
@@ -134,7 +193,6 @@ class SentenceLimiter:
             return PipelineProcessingStatus.CONTINUE
         else:
             return PipelineProcessingStatus.STOP_PROCESSING
-
 
 class PipelineProcessingStatus:
     CONTINUE = 0
@@ -156,16 +214,19 @@ class PipelineProcessor:
         self.pipeline_components = pipeline_components
 
     def __call__(self, root_nodes):
-        stop_processing = False
-        local_context = PipelineContext()
-        for component in self.pipeline_components:
-            status = component(root_nodes, local_context)
-            if status == PipelineProcessingStatus.STOP_PROCESSING:
-                return False
-            elif status == PipelineProcessingStatus.DISCARD_NODES:
-                break
-            elif status != PipelineProcessingStatus.CONTINUE:
-                raise RuntimeError("Status {0} is invalid", status)
+        try:
+            stop_processing = False
+            local_context = PipelineContext()
+            for component in self.pipeline_components:
+                status = component(root_nodes, local_context)
+                if status == PipelineProcessingStatus.STOP_PROCESSING:
+                    return False
+                elif status == PipelineProcessingStatus.DISCARD_NODES:
+                    break
+                elif status != PipelineProcessingStatus.CONTINUE:
+                    raise RuntimeError("Status {0} is invalid", status)
+        except Exception as e:
+            print "Skipping sentence {0}".format(root_nodes)
         return True
 
 class SentenceTuple:
@@ -221,13 +282,25 @@ if __name__ == "__main__":
 
     sentence_counter = SentenceCounter()
     success_counter = SentenceCounter()
+    entity_collector = EntityCollector()
     dependency.process_sdewac_splits(
             args.indir,
             PipelineProcessor(
                 sentence_counter,
+                CountIndicator(sentence_counter, "Processing sentence #"),
                 SentenceAnalyser(get_trigger_predicate(args.triggerfile)),
-                SentenceFilter([is_complex_sentence, has_named_entity_subject, has_trigger_pred, has_no_unresolved_pronouns]),
+                SentenceFilter([has_named_entity_subject, has_trigger_pred, has_no_unresolved_pronouns, is_not_reflexive]),
+                entity_collector,
                 success_counter,
-                SentencePrinter()))
+                #SentencePrinter()
+                ))
+
     print "Found {0} candidates out of {1} sentences".format(success_counter.count, sentence_counter.count)
+
+    print "Best SUBJ entities:"
+    print entity_collector.subj_position_entities_counter.most_common(25)
+    print "Best OBJ entities:"
+    print entity_collector.obj_position_entities_counter.most_common(25)
+    print "Best relations:"
+    print entity_collector.relation_counter.most_common(25)
 
