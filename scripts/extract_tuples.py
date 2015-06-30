@@ -55,6 +55,28 @@ class get_trigger_predicate:
 def has_unmodified_predicate(sentence):
     return len(sentence.predicate_node.find_children_by_label("MO")) == 0
 
+class SentenceWriter:
+    def __init__(self, filename):
+        self.filename = filename
+        self.sentence_counter = 0
+
+    def __call__(self, root_nodes, local_context):
+        all_nodes = []
+        for node in root_nodes:
+            all_nodes += node.all_tree_nodes
+
+        with open(self.filename, "a") as f:
+            for sid, node in enumerate(sorted(all_nodes, key = lambda n: n.id)):
+                tid = "{0}_{1}".format(self.sentence_counter, node.id)
+                parent_id = 0
+                if node.parent:
+                    parent_id = node.parent.id
+                f.write("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}\t{10}\t{11}\t{12}\t{13}\t{14}\t\n"\
+                        .format(tid, node.word, "_", node.lemma, "_", node.pos_tag, "_", "_", "_", parent_id, "_", node.parent_relation_label, "_", "_")
+                        )
+            f.write("\n")
+        self.sentence_counter += 1
+
 class SentenceAnalyser:
     def __init__(self, get_trigger_predicate):
         self.get_trigger_predicate = get_trigger_predicate
@@ -141,6 +163,7 @@ class EntityCollector:
         self.subj_position_entities_counter = Counter()
         self.obj_position_entities_counter = Counter()
         self.relation_counter = Counter()
+        self.entity_relation_counter = Counter()
 
     def __call__(self, root_nodes, local_context):
         sentence = local_context.sentence
@@ -150,11 +173,13 @@ class EntityCollector:
 
     def count_sentence(self, sentence):
         all_entity_strs = []
+        all_entity_nodes = []
         curr_sentence = sentence
 
         while curr_sentence.is_complex_sentence:
             subj_str = curr_sentence.subject_node.word
             all_entity_strs.append(subj_str)
+            all_entity_nodes.append(curr_sentence.subject_node)
             self.subj_position_entities_counter[subj_str] += 1
 
             curr_sentence = curr_sentence.object_node
@@ -163,17 +188,26 @@ class EntityCollector:
         self.subj_position_entities_counter[subj_str] += 1
         all_entity_strs.append(subj_str)
 
+        all_entity_nodes.append(sentence.subject_node)
+
         obj_str = curr_sentence.object_node.word
         self.obj_position_entities_counter[obj_str] += 1
         all_entity_strs.append(obj_str)
 
-        self.relation_counter.update(fold_forward(all_entity_strs))
+        all_entity_nodes.append(curr_sentence.object_node)
 
-def fold_forward(list_):
+        self.relation_counter.update(fold_forward(all_entity_strs))
+        self.entity_relation_counter.update(fold_forward(map(lambda n: n.word, filter(
+            lambda n: n.pos_tag == "NE",
+            all_entity_nodes
+            ))))
+
+def fold_forward(list_or_iter):
     """
     Combines the elements in an iterable into two-tuples
     so that each element is combined with all elements that follow it.
     """
+    list_ = list(list_or_iter)
     if len(list_) == 1:
         return []
     result = []
@@ -226,7 +260,7 @@ class PipelineProcessor:
                 elif status != PipelineProcessingStatus.CONTINUE:
                     raise RuntimeError("Status {0} is invalid", status)
         except Exception as e:
-            print "Skipping sentence {0}".format(root_nodes)
+            print "Skipping sentence {0} ({1})".format(root_nodes, e)
         return True
 
 class SentenceTuple:
@@ -289,9 +323,10 @@ if __name__ == "__main__":
                 sentence_counter,
                 CountIndicator(sentence_counter, "Processing sentence #"),
                 SentenceAnalyser(get_trigger_predicate(args.triggerfile)),
-                SentenceFilter([has_named_entity_subject, has_trigger_pred, has_no_unresolved_pronouns, is_not_reflexive]),
+                SentenceFilter([has_named_entity_subject, has_no_unresolved_pronouns, is_not_reflexive]),
                 entity_collector,
                 success_counter,
+                SentenceWriter("candidates.lmtp")
                 #SentencePrinter()
                 ))
 

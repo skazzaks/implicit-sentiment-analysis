@@ -9,10 +9,12 @@ class DependencyNode:
         self.pos_tag = pos_tag
         self.children = []
         self.parent = None
+        self.parent_relation_label = "--"
 
     def add_child(self, child, label):
         self.children.append((child, label))
         child.parent = self
+        child.parent_relation_label = label
 
     @property
     def is_root(self):
