@@ -77,6 +77,8 @@ class SentenceWriter:
             f.write("\n")
         self.sentence_counter += 1
 
+        return PipelineProcessingStatus.CONTINUE
+
 class SentenceAnalyser:
     def __init__(self, get_trigger_predicate):
         self.get_trigger_predicate = get_trigger_predicate
