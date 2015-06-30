@@ -71,7 +71,7 @@ class SentenceWriter:
                 parent_id = 0
                 if node.parent:
                     parent_id = node.parent.id
-                f.write("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}\t{10}\t{11}\t{12}\t{13}\t{14}\t\n"\
+                f.write("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}\t{10}\t{11}\t{12}\t{13}\t\n"\
                         .format(tid, node.word, "_", node.lemma, "_", node.pos_tag, "_", "_", "_", parent_id, "_", node.parent_relation_label, "_", "_")
                         )
             f.write("\n")
