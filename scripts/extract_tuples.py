@@ -325,7 +325,7 @@ if __name__ == "__main__":
                 sentence_counter,
                 CountIndicator(sentence_counter, "Processing sentence #"),
                 SentenceAnalyser(get_trigger_predicate(args.triggerfile)),
-                SentenceFilter([has_named_entity_subject, has_no_unresolved_pronouns, is_not_reflexive]),
+                SentenceFilter([has_named_entity_subject, is_not_reflexive]),
                 entity_collector,
                 success_counter,
                 SentenceWriter("candidates.lmtp")
