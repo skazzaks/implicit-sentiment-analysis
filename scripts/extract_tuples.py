@@ -318,26 +318,26 @@ if __name__ == "__main__":
 
     sentence_counter = SentenceCounter()
     success_counter = SentenceCounter()
-    entity_collector = EntityCollector()
+#    entity_collector = EntityCollector()
     dependency.process_sdewac_splits(
             args.indir,
             PipelineProcessor(
                 sentence_counter,
                 CountIndicator(sentence_counter, "Processing sentence #"),
                 SentenceAnalyser(get_trigger_predicate(args.triggerfile)),
-                SentenceFilter([has_named_entity_subject, is_not_reflexive]),
-                entity_collector,
+                SentenceFilter([has_trigger_pred, is_complex_sentence]),
+#                entity_collector,
                 success_counter,
                 SentenceWriter("candidates.lmtp")
                 #SentencePrinter()
                 ))
 
-    print "Found {0} candidates out of {1} sentences".format(success_counter.count, sentence_counter.count)
+#    print "Found {0} candidates out of {1} sentences".format(success_counter.count, sentence_counter.count)
 
-    print "Best SUBJ entities:"
-    print entity_collector.subj_position_entities_counter.most_common(25)
-    print "Best OBJ entities:"
-    print entity_collector.obj_position_entities_counter.most_common(25)
-    print "Best relations:"
-    print entity_collector.relation_counter.most_common(25)
+#    print "Best SUBJ entities:"
+#    print entity_collector.subj_position_entities_counter.most_common(25)
+#    print "Best OBJ entities:"
+#    print entity_collector.obj_position_entities_counter.most_common(25)
+#    print "Best relations:"
+#    print entity_collector.relation_counter.most_common(25)
 
