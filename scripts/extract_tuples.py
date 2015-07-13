@@ -333,9 +333,13 @@ class SentencePolarityWriter:
 
     def __call__(self, root_nodes, local_context):
         with open(self.filename, "a") as f:
+            if local_context.sentence.predicate_polarity == 1:
+                predicate_polarity_label = "+"
+            else:
+                predicate_polarity_label = "-"
             f.write("{0}\t{1}\t{2}".format(
                 local_context.sentence.predicate_trigger,
-                local_context.sentence.predicate_polarity,
+                predicate_polarity_label,
                 local_context.sentence.object_node.predicate_node.lemma))
             f.write("\n")
 
