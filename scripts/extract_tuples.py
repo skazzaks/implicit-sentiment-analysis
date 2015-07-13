@@ -26,6 +26,14 @@ def run_hdpro(filename):
 def is_complex_sentence(sentence):
     return sentence.is_complex_sentence
 
+class has_embedding_depth_between:
+    def __init__(self, min_, max_):
+        self.min_ = min_
+        self.max_ = max_
+
+    def __call__(self, sentence):
+        return sentence.embedding_depth >= self.min_ and sentence.embedding_depth >= self.max_
+
 def has_named_entity_subject(sentence):
     return sentence.subject_node.pos_tag == "NE"
 
@@ -275,6 +283,15 @@ class SentenceTuple:
         self.predicate_polarity = pred_polarity
 
     @property
+    def embedding_depth(self):
+        curr_sentence = self
+        depth = 0
+        while curr_sentence.is_complex_sentence:
+            depth += 1
+            curr_sentence = curr_sentence.object_node
+        return depth
+
+    @property
     def is_complex_sentence(self):
         return isinstance(self.object_node, SentenceTuple)
 
@@ -310,6 +327,20 @@ class SentenceTuple:
 
         return final_str
 
+class SentencePolarityWriter:
+    def __init__(self, filename):
+        self.filename = filename
+
+    def __call__(self, root_nodes, local_context):
+        with open(self.filename, "a") as f:
+            f.write("{0}\t{1}\t{2}".format(
+                local_context.sentence.predicate_trigger,
+                local_context.sentence.predicate_polarity,
+                local_context.sentence.object_node.predicate_node.lemma))
+            f.write("\n")
+
+        return PipelineProcessingStatus.CONTINUE
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="")
     parser.add_argument("indir")
@@ -318,26 +349,27 @@ if __name__ == "__main__":
 
     sentence_counter = SentenceCounter()
     success_counter = SentenceCounter()
-    entity_collector = EntityCollector()
+#    entity_collector = EntityCollector()
     dependency.process_sdewac_splits(
             args.indir,
             PipelineProcessor(
                 sentence_counter,
                 CountIndicator(sentence_counter, "Processing sentence #"),
                 SentenceAnalyser(get_trigger_predicate(args.triggerfile)),
-                SentenceFilter([has_named_entity_subject, is_not_reflexive]),
-                entity_collector,
+                SentenceFilter([has_trigger_pred, has_embedding_depth_between(1, 1)]),
+#                entity_collector,
                 success_counter,
-                SentenceWriter("candidates.lmtp")
+                SentenceWriter("candidates.lmtp"),
+                SentencePolarityWriter("events.txt")
                 #SentencePrinter()
                 ))
 
-    print "Found {0} candidates out of {1} sentences".format(success_counter.count, sentence_counter.count)
+#    print "Found {0} candidates out of {1} sentences".format(success_counter.count, sentence_counter.count)
 
-    print "Best SUBJ entities:"
-    print entity_collector.subj_position_entities_counter.most_common(25)
-    print "Best OBJ entities:"
-    print entity_collector.obj_position_entities_counter.most_common(25)
-    print "Best relations:"
-    print entity_collector.relation_counter.most_common(25)
+#    print "Best SUBJ entities:"
+#    print entity_collector.subj_position_entities_counter.most_common(25)
+#    print "Best OBJ entities:"
+#    print entity_collector.obj_position_entities_counter.most_common(25)
+#    print "Best relations:"
+#    print entity_collector.relation_counter.most_common(25)
 
