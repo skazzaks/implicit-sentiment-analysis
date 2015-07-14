@@ -7,7 +7,6 @@ ablenken -
 ablesen +
 abliegen +
 abneigen -
-[['abneigen',en '-'],
 abneigungen -
 abreagieren +
 abscheulichen -
