@@ -2,6 +2,7 @@ import argparse
 from scipy.stats import chisquare
 import numpy as np
 
+import math
 
 # This class captures each 'Event' where an 'Event' is 'something that
 # happens to someone or something'. In our case, this starts off a just a
@@ -51,17 +52,54 @@ class EventStatistic:
 
         return self.polarity, probability
 
+def calculate_events_pmi(event, total_p_pos, total_p_neg):
+    total = event.positive_count + event.negative_count
+
+    #p(+ | ev)
+    p_pos = event.positive_count / float(total)
+    #p(- | ev)
+    p_neg = event.negative_count / float(total)
+
+    if p_pos == 0:
+        pmi_pos = float('-inf')
+    else:
+        #log(p(+ | ev) / p(+))
+        pmi_pos = math.log(p_pos/total_p_pos)
+
+    if p_neg == 0:
+        pmi_neg = float('-inf')
+    else:
+        pmi_neg = math.log(p_neg/total_p_neg)
+
+    if pmi_pos > pmi_neg:
+        return "+", pmi_pos
+    else:
+        return "-", pmi_neg
 
 # Calculates the chi_squared value for all of the passed in events
 def calculate_chi_squared(events):
+    results = {}
+
+    total_pos_p, total_neg_p = get_total_pos_neg_probability_in_events(events)
+
     for key, event in events.iteritems():
         if event.total < 5:
             continue
 
-        chi = event.chi_square
-        print event.event + ": " + chi[0] + " " + str(chi[1]) + " " +  \
-            str([event.positive_count, event.negative_count])
+        #results[key] = event.chi_square
+        results[key] = calculate_events_pmi(event, total_pos_p, total_neg_p)
 
+        #print event.event + ": " + chi[0] + " " + str(chi[1]) + " " +  \
+        #    str([event.positive_count, event.negative_count])
+    return results
+
+def get_total_pos_neg_probability_in_events(events):
+    pos_count = 0
+    neg_count = 0
+    for event in events.values():
+        pos_count += event.positive_count
+        neg_count += event.negative_count
+    return pos_count / float(pos_count + neg_count), neg_count / float(pos_count + neg_count)
 
 def load_in_events(event_file):
     events = {}
@@ -88,4 +126,10 @@ if __name__ == "__main__":
 
     events = load_in_events(args.input_file)
 
-    calculate_chi_squared(events)
+    results = calculate_chi_squared(events)
+
+    sorted_results = sorted(results.items(), key=lambda r: r[1], reverse = True)
+
+    for key, chi in sorted_results:
+        event = events[key]
+        print "{0} {1} {2} [{3}, {4}]".format(key, chi[0], chi[1], event.positive_count, event.negative_count)
