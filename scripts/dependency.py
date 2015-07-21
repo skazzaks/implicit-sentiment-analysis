@@ -88,8 +88,13 @@ def process_conll_stream(instream, processor):
         if not should_continue:
             break
 
-def process_sdewac_splits(root_directory, processor):
-    for file_ in os.listdir(root_directory):
+def process_sdewac_splits(root_directory, processor, start_split = 0, split_num = -1):
+    all_files = sorted(os.listdir(root_directory))
+    if split_num == -1:
+        all_files = all_files[start_split:]
+    else:
+        all_files = all_files[start_split:start_split + split_num]
+    for file_ in all_files:
         try:
             file_path = os.path.join(root_directory, file_)
             with gzip.open(file_path, 'rb') as f:

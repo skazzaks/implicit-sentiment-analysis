@@ -157,15 +157,20 @@ class SentenceCounter:
         return PipelineProcessingStatus.CONTINUE
 
 class CountIndicator:
-    def __init__(self, counter, prefix):
+    def __init__(self, counter, prefix, single_line, update_interval):
         self.counter = counter
         self.prefix = prefix
+        self.update_interval = update_interval
+        self.single_line = single_line
 
     def __call__(self, root_nodes, local_context):
-        sys.stdout.write(self.prefix + str(self.counter.count))
-        sys.stdout.write("\r")
-        sys.stdout.flush()
-
+        if self.counter.count % self.update_interval == 0:
+            sys.stdout.write(self.prefix + str(self.counter.count))
+            if self.single_line:
+                sys.stdout.write("\r")
+            else:
+                sys.stdout.write("\n")
+            sys.stdout.flush()
         return PipelineProcessingStatus.CONTINUE
 
 class EntityCollector:
@@ -349,7 +354,23 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="")
     parser.add_argument("indir")
     parser.add_argument("triggerfile")
+    parser.add_argument("--pid", default="")
+    parser.add_argument("--start-split", default=0, type = int)
+    parser.add_argument("--splitn", default=-1, type = int)
+    parser.add_argument("--no-ui", dest = 'ui', action = 'store_false')
+    parser.set_defaults(ui = True)
     args = parser.parse_args()
+
+    process_identifier = args.pid
+    start_split = args.start_split
+    split_num = args.splitn
+
+    if args.ui:
+        count_line = "Processing sentence #"
+        count_update_interval = 1
+    else:
+        count_update_interval = 1000
+        count_line = "Process {0} at sentence #".format(process_identifier)
 
     sentence_counter = SentenceCounter()
     success_counter = SentenceCounter()
@@ -358,15 +379,18 @@ if __name__ == "__main__":
             args.indir,
             PipelineProcessor(
                 sentence_counter,
-                CountIndicator(sentence_counter, "Processing sentence #"),
+                CountIndicator(sentence_counter, count_line, single_line = args.ui, update_interval = count_update_interval),
                 SentenceAnalyser(get_trigger_predicate(args.triggerfile)),
                 SentenceFilter([has_trigger_pred, has_embedding_depth_between(1, 1)]),
 #                entity_collector,
                 success_counter,
-                SentenceWriter("candidates.lmtp"),
-                SentencePolarityWriter("events.txt")
+                SentenceWriter("candidates{0}.lmtp".format(process_identifier)),
+                SentencePolarityWriter("events{0}.txt".format(process_identifier))
                 #SentencePrinter()
-                ))
+                ),
+            start_split = start_split,
+            split_num = split_num
+            )
 
 #    print "Found {0} candidates out of {1} sentences".format(success_counter.count, sentence_counter.count)
 
