@@ -23,7 +23,7 @@ def start_processes_on_files(scriptpath, indir, triggerfile, files, files_per_pr
 
     return processes
 
-def collect_processes(processes):
+def wait_for_processes(processes):
     original_process_count = len(processes)
     while len(processes) > 0:
         to_remove = []
@@ -39,6 +39,7 @@ def collect_processes(processes):
             del processes[pid]
         time.sleep(0.5)
 
+def collect_files(original_process_count):
     with open("candidates.ltmp", "w") as f_candidates:
         for pid in range(0, original_process_count):
             with open("candidates{0}.ltmp".format(pid)) as f:
@@ -56,11 +57,16 @@ if __name__ == "__main__":
     parser.add_argument("scriptpath")
     parser.add_argument("indir")
     parser.add_argument("triggerfile")
+    parser.add_argument("--collect", target = "collect_only", action = "store_true")
+    parser.defaults(collect_only = False)
 
     args = parser.parse_args()
 
-    processes = start_processes_on_files(args.scriptpath, args.indir, args.triggerfile, os.listdir(args.indir))
-    collect_processes(processes)
+    if not args.collect_only:
+        processes = start_processes_on_files(args.scriptpath, args.indir, args.triggerfile, os.listdir(args.indir))
+        original_process_count = len(processes)
+        wait_for_processes(processes)
+    collect_files(original_process_count)
 
     print "Done"
 
