@@ -26,6 +26,9 @@ def run_hdpro(filename):
 def is_complex_sentence(sentence):
     return sentence.is_complex_sentence
 
+def has_subj_and_obj(sentence):
+    return sentence.subject_node and sentence.object_node
+
 class has_embedding_depth_between:
     def __init__(self, min_, max_):
         self.min_ = min_
@@ -33,6 +36,24 @@ class has_embedding_depth_between:
 
     def __call__(self, sentence):
         return sentence.embedding_depth >= self.min_ and sentence.embedding_depth >= self.max_
+
+class has_gfbf_event:
+    def __init__(self, filename):
+        self.preds = {}
+        with open(filename) in f:
+            for line in f:
+                pred, polarity = line.split()
+                preds[pred] = polarity
+
+    def __call__(self, sentence):
+        has_gfbf_pred = sentence.predicate_node.lemma in self.preds
+
+        if has_gfbf_pred:
+            return True
+        elif sentence.is_complex_sentence:
+            return self(sentence.object_node)
+        else:
+            return False
 
 def has_named_entity_subject(sentence):
     return sentence.subject_node.pos_tag == "NE"
@@ -115,6 +136,9 @@ class SentenceAnalyser:
 
             if subject and embeded_sentence:
                 return SentenceTuple(root_node, subject, embeded_sentence, modifiers, trigger_pred, pred_polarity)
+
+        if subject:
+            return SentenceTuple(root_node, subject, None, modifiers, trigger_pred, pred_polarity)
 
         return None
 
@@ -350,6 +374,43 @@ class SentencePolarityWriter:
 
         return PipelineProcessingStatus.CONTINUE
 
+
+def run_default_pipeline(args):
+    if args.ui:
+        count_line = "Processing sentence #"
+        count_update_interval = 1
+    else:
+        count_update_interval = 1000
+        count_line = "Process {0} at sentence #".format(process_identifier)
+
+    sentence_counter = SentenceCounter()
+    success_counter = SentenceCounter()
+    dependency.process_sdewac_splits(
+            args.indir,
+            PipelineProcessor(
+                sentence_counter,
+                CountIndicator(sentence_counter, count_line, single_line = args.ui, update_interval = count_update_interval),
+                SentenceAnalyser(get_trigger_predicate(args.triggerfile)),
+                SentenceFilter([has_trigger_pred, has_embedding_depth_between(1, 1)]),
+                success_counter,
+                SentenceWriter("candidates{0}.lmtp".format(process_identifier)),
+                SentencePolarityWriter("events{0}.txt".format(process_identifier))
+                ),
+            start_split = start_split,
+            split_num = split_num
+            )
+
+def run_gfbf_pipeline(args):
+    dependency.process_sdewac_splits(
+            args.indir,
+            PipelineProcessor(
+                SentenceFilter([has_gfbf_event("gfbf.txt")]),
+                SentenceWriter("candidates{0}.lmtp".format(process_identifier)),
+                ),
+            start_split = start_split,
+            split_num = split_num
+            )
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="")
     parser.add_argument("indir")
@@ -365,32 +426,9 @@ if __name__ == "__main__":
     start_split = args.start_split
     split_num = args.splitn
 
-    if args.ui:
-        count_line = "Processing sentence #"
-        count_update_interval = 1
-    else:
-        count_update_interval = 1000
-        count_line = "Process {0} at sentence #".format(process_identifier)
+    run_gfbf_pipeline(args)
 
-    sentence_counter = SentenceCounter()
-    success_counter = SentenceCounter()
-#    entity_collector = EntityCollector()
-    dependency.process_sdewac_splits(
-            args.indir,
-            PipelineProcessor(
-                sentence_counter,
-                CountIndicator(sentence_counter, count_line, single_line = args.ui, update_interval = count_update_interval),
-                SentenceAnalyser(get_trigger_predicate(args.triggerfile)),
-                SentenceFilter([has_trigger_pred, has_embedding_depth_between(1, 1)]),
-#                entity_collector,
-                success_counter,
-                SentenceWriter("candidates{0}.lmtp".format(process_identifier)),
-                SentencePolarityWriter("events{0}.txt".format(process_identifier))
-                #SentencePrinter()
-                ),
-            start_split = start_split,
-            split_num = split_num
-            )
+    #run_default_pipeline(args)
 
 #    print "Found {0} candidates out of {1} sentences".format(success_counter.count, sentence_counter.count)
 
