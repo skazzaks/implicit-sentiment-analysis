@@ -55,13 +55,13 @@ class DependencyNode:
             return None
         else:
             return result[0]
-	
-    # Finds all of the children that have the given pos_tag
+
     def find_children_by_POS_tag(self, pos_tag):
+        result = []
         for child, label in self.children:
             if child.pos_tag == pos_tag:
-                yield child.word
-
+                result.append(child)
+        return result
 
     @property
     def flat_text(self):

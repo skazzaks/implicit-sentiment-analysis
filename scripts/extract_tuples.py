@@ -5,6 +5,7 @@ import argparse
 import dependency
 import copy
 import sys
+import traceback
 
 from collections import Counter
 
@@ -35,15 +36,15 @@ class has_embedding_depth_between:
         self.max_ = max_
 
     def __call__(self, sentence):
-        return sentence.embedding_depth >= self.min_ and sentence.embedding_depth >= self.max_
+        return sentence.embedding_depth >= self.min_ and sentence.embedding_depth <= self.max_
 
 class has_gfbf_event:
     def __init__(self, filename):
         self.preds = {}
-        with open(filename) in f:
+        with open(filename) as f:
             for line in f:
                 pred, polarity = line.split()
-                preds[pred] = polarity
+                self.preds[pred] = polarity
 
     def __call__(self, sentence):
         has_gfbf_pred = sentence.predicate_node.lemma in self.preds
@@ -155,6 +156,129 @@ class SentenceAnalyser:
         results = list(root_node.find_children_by_POS_tag(POS_ADV))
         results.extend(list(root_node.find_children_by_POS_tag(POS_NICHT)))
         return results
+
+class PureSentenceAnalyser:
+    def __init__(self):
+        pass
+
+    def __call__(self, root_nodes, local_context):
+        longest_node = max(root_nodes, key = lambda n: n.child_count)
+        sentence = self.analyse_sentence(longest_node)
+        if sentence:
+            local_context.sentence = sentence
+            return PipelineProcessingStatus.CONTINUE
+        else:
+            return PipelineProcessingStatus.DISCARD_NODES
+
+    def analyse_sentence(self, root_node):
+        subject, dir_object = self.get_subject_and_object_from_node(root_node)
+        modifiers = self.get_modifiers(root_node)
+
+        if subject and dir_object:
+            return SentenceTuple(root_node, subject, dir_object, modifiers, None, None)
+
+        comp_phrase = root_node.find_child_by_label("OC")
+
+        if comp_phrase:
+            embeded_sentence = self.analyse_sentence(comp_phrase)
+
+            if subject and embeded_sentence:
+                return SentenceTuple(root_node, subject, embeded_sentence, modifiers, None, None)
+
+        if subject:
+            return SentenceTuple(root_node, subject, None, modifiers, None, None)
+
+        return None
+
+    def get_subject_and_object_from_node(self, root_node):
+        subject = root_node.find_child_by_label("SB")
+        dir_object = root_node.find_child_by_label("OA")
+        return subject, dir_object
+
+    def get_modifiers(self, root_node):
+        """
+        Retrieves the set of modifiers (right now just adverbs) that occur
+        at the provided level of the sentence
+        """
+        results = list(root_node.find_children_by_POS_tag(POS_ADV))
+        results.extend(list(root_node.find_children_by_POS_tag(POS_NICHT)))
+        return results
+
+class SentenceOpinionAnalyser:
+    def __init__(self, opinion_trigger_filename, gfbf_trigger_filename):
+        self.opinion_tiggers = {}
+        with open(opinion_trigger_filename) as f_trig:
+            for line in f_trig:
+                lemma, mood = line.split("\t")
+                if mood == "+":
+                    mood = 1
+                else:
+                    mood = -1
+                self.opinion_tiggers[lemma] = mood
+
+        self.gfbf_triggers = {}
+        with open(gfbf_trigger_filename) as f_gfbf:
+            for line in f_gfbf:
+                lemma, mood = line.split("\t")
+                if mood == "+":
+                    mood = 1
+                else:
+                    mood = -1
+                self.gfbf_triggers[lemma] = mood
+
+    def __call__(self, root_nodes, local_context):
+        sentence = local_context.sentence
+        if sentence.predicate_node.lemma in self.opinion_tiggers \
+            and sentence.is_complex_sentence \
+            and sentence.object_node.predicate_node.lemma in self.gfbf_triggers:
+
+            opinion_predicate = sentence.predicate_node.lemma
+            gfbf_predicate = sentence.object_node.predicate_node.lemma
+            local_context.opinion_holder = sentence.subject_node.lemma
+            local_context.opinion_target = sentence.object_node.object_node.lemma
+            local_context.opinion_trigger = sentence.predicate_node.lemma
+            local_context.gfbf_trigger = sentence.object_node.predicate_node.lemma
+
+            mood_opinion = self.opinion_tiggers[opinion_predicate]
+            mood_gfbf = self.gfbf_triggers[gfbf_predicate]
+
+            if self.is_sentence_negated(sentence):
+                mood_opinion = -mood_opinion
+
+            if self.is_sentence_negated(sentence.object_node):
+                mood_gfbf = -mood_gfbf
+
+            if mood_opinion == mood_gfbf:
+                local_context.opinion_mood = +1
+            else:
+                local_context.opinion_mood = -1
+            return PipelineProcessingStatus.CONTINUE
+        else:
+            return PipelineProcessingStatus.DISCARD_NODES
+    def is_sentence_negated(self, sentence):
+        for node in sentence.modifiers:
+            if node.lemma == "nicht":
+                return True
+        return False
+
+class SentenceOpinionWriter:
+    def __init__(self, target_filename):
+        self.target_filename = target_filename
+    def __call__(self, root_nodes, local_context):
+        sentence = local_context.sentence
+        with open(self.target_filename, "a") as f:
+            for node in root_nodes:
+                f.write(node.flat_text)
+            f.write("\n")
+            if local_context.opinion_mood > 0:
+                mood = "+"
+            else:
+                mood = "-"
+            f.write("{src} -({mood})-> {trg}\n".format(src = local_context.opinion_holder, trg = local_context.opinion_target, mood = mood))
+            f.write("Trigger: {}\n".format(local_context.opinion_trigger))
+            f.write("GF/BF-Event: {}\n".format(local_context.gfbf_trigger))
+            f.write("\n")
+        return PipelineProcessingStatus.CONTINUE
 
 class SentenceFilter:
     def __init__(self, conditions = []):
@@ -299,7 +423,7 @@ class PipelineProcessor:
                 elif status != PipelineProcessingStatus.CONTINUE:
                     raise RuntimeError("Status {0} is invalid", status)
         except Exception as e:
-            print "Skipping sentence {0} ({1})".format(root_nodes, e)
+            print "Skipping sentence {0} ({1})".format(root_nodes, traceback.format_exc())
         return True
 
 class SentenceTuple:
@@ -374,6 +498,31 @@ class SentencePolarityWriter:
 
         return PipelineProcessingStatus.CONTINUE
 
+class SentenceTriggerWriter:
+    def __init__(self, target_filename, gfbf_filename):
+        self.preds = {}
+        self.counter = 0
+        with open(gfbf_filename) as f:
+            for line in f:
+                pred, polarity = line.split()
+                self.preds[pred] = polarity
+        self.target_filename = target_filename
+
+    def __call__(self, root_nodes, local_context):
+        sentence = local_context.sentence
+        with open(self.target_filename, "a") as f:
+            if sentence.object_node.predicate_node.lemma in self.preds:
+                f.write("{0}\t{1}\t{2}\t{3}".format(
+                sentence.predicate_node.lemma,
+                sentence.object_node.predicate_node.lemma,
+                self.preds[sentence.object_node.predicate_node.lemma],
+                self.counter))
+                f.write("\n")
+
+        self.counter += 1
+
+        return PipelineProcessingStatus.CONTINUE
+
 
 def run_default_pipeline(args):
     if args.ui:
@@ -383,6 +532,8 @@ def run_default_pipeline(args):
         count_update_interval = 1000
         count_line = "Process {0} at sentence #".format(process_identifier)
 
+    start_split = args.start_split
+    split_num = args.splitn
     sentence_counter = SentenceCounter()
     success_counter = SentenceCounter()
     dependency.process_sdewac_splits(
@@ -401,20 +552,44 @@ def run_default_pipeline(args):
             )
 
 def run_gfbf_pipeline(args):
+    success_counter = SentenceCounter()
+    start_split = args.start_split
+    split_num = args.splitn
+
     dependency.process_sdewac_splits(
             args.indir,
             PipelineProcessor(
-                SentenceFilter([has_gfbf_event("gfbf.txt")]),
+                SentenceAnalyser(get_trigger_predicate(args.triggerfile)),
+                SentenceFilter([has_embedding_depth_between(1, 5)]),
+                SentenceFilter([has_gfbf_event("data/gfbf.txt")]),
+                SentenceTriggerWriter("trigger_gfbf.txt", "data/gfbf.txt"),
                 SentenceWriter("candidates{0}.lmtp".format(process_identifier)),
+                success_counter
                 ),
             start_split = start_split,
             split_num = split_num
             )
 
+def run_classification_pipeline(args):
+    start_split = args.start_split
+    split_num = args.splitn
+    dependency.process_sdewac_splits(
+            args.indir,
+            PipelineProcessor(
+                PureSentenceAnalyser(),
+                SentenceOpinionAnalyser(args.triggerfile, args.gfbffile),
+                SentenceOpinionWriter("opinions.txt"),
+                SentenceWriter("candidates.lmtp")
+                ),
+            start_split = start_split,
+            split_num = split_num
+    )
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="")
     parser.add_argument("indir")
     parser.add_argument("triggerfile")
+    parser.add_argument("gfbffile")
     parser.add_argument("--pid", default="")
     parser.add_argument("--start-split", default=0, type = int)
     parser.add_argument("--splitn", default=-1, type = int)
@@ -426,7 +601,9 @@ if __name__ == "__main__":
     start_split = args.start_split
     split_num = args.splitn
 
-    run_gfbf_pipeline(args)
+    run_classification_pipeline(args)
+
+    #run_gfbf_pipeline(args)
 
     #run_default_pipeline(args)
 
