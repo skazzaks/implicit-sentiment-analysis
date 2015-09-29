@@ -1,0 +1,27 @@
+Authors: Devon Fritz and Julius Steen
+
+Overview
+--------
+The purpose of this project is to be able to detect implicit sentiments in natural text. This file outlines how to use the provided code. For more information about the goals of the project, as well as a more in depth analysis, please see the accompanying PDF.
+
+Important Files
+-----
+README - this file
+data/
+	chi_values.s.txt - A list of verbs as well as their relative Chi Squared Values and their absolute count of positive and negative associations. 
+	lexicon.txt - The lexicon used for the project as well as a binary sentiment value, indicating whether the word has a positive or negative sentiment.
+	events.txt - A list of items from the lexicon combined with a second verb (a so-called 'event') with which the word appears. The aggregation of these items forms the chi_values.s.txt file.
+
+scripts/
+	calculate_chi_squared.py - Calculates the chi squared values from the events.txt file.
+	convert_lexicon_to_german.py - Takes the initial English lexicon list and converts the items to German, using a google translate plugin.
+	dependency.py - Helper class that represents the parsed nodes of a sentence.
+	expand_lexicon.py - Tool that expands our initial lexicon by using Germanet, wordnet for German, by finding the hyponyms of the initial lexicon.
+	extract_tuples.py - The main processing pipeline for the task. This script processes each sentence from our dataset, filtering for only those sentences which we care about and parsing them into a tree format.
+
+The corpus use is the sdewac corpus, which is in German and contains .88 billion words.
+
+Process
+-------
+The description of how to process the files is included in the accompanying PDF.
+
